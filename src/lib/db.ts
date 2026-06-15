@@ -1,4 +1,7 @@
-import { sql } from "@vercel/postgres";
+import { createPool } from "@vercel/postgres";
+
+const pool = createPool({ connectionString: process.env.NEON_URL });
+const sql = pool.sql;
 
 export async function initDb() {
   await sql`
