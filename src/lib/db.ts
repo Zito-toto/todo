@@ -1,6 +1,6 @@
 import { createPool } from "@vercel/postgres";
 
-const pool = createPool({ connectionString: process.env.NEON_URL });
+const pool = createPool({ connectionString: process.env.NEON_POSTGRES_URL });
 const sql = pool.sql;
 
 export async function initDb() {
