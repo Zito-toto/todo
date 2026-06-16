@@ -1,7 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 
 function getDb() {
-  return neon(process.env.NEON_POSTGRES_URL!);
+  return neon((process.env.NEON_POSTGRES_URL ?? process.env.neon_POSTGRES_URL)!);
 }
 
 export async function initDb() {
