@@ -3,20 +3,20 @@
 import { useState } from "react";
 import { Todo } from "@/types";
 import Countdown from "./Countdown";
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { ChevronRight, Trash2 } from "lucide-react";
 
-const PRIORITY_BADGE: Record<string, string> = {
-  urgent: "🔴",
-  normal: "🟡",
-  low: "🟢",
+const PRIORITY_COLOR: Record<string, string> = {
+  urgent: "#FF3B30",
+  normal: "#FF9500",
+  low: "#34C759",
 };
 
-const CATEGORY_COLOR: Record<string, string> = {
-  집안일: "bg-blue-100 text-blue-700",
-  심부름: "bg-orange-100 text-orange-700",
-  개인: "bg-purple-100 text-purple-700",
-  장보기: "bg-green-100 text-green-700",
-  기타: "bg-gray-100 text-gray-600",
+const CATEGORY_BG: Record<string, string> = {
+  집안일: "bg-blue-50 text-[#007AFF]",
+  심부름: "bg-orange-50 text-[#FF9500]",
+  개인: "bg-purple-50 text-[#AF52DE]",
+  장보기: "bg-green-50 text-[#34C759]",
+  기타: "bg-gray-100 text-gray-500",
 };
 
 type Props = {
@@ -43,85 +43,78 @@ export default function TodoItem({ todo, today, onToggle, onDelete }: Props) {
   };
 
   return (
-    <div
-      className={`bg-white rounded-xl shadow-sm border transition-all ${todo.completed ? "opacity-60" : ""}`}
-    >
-      <div className="flex items-center gap-3 p-4">
+    <div className={`transition-opacity ${todo.completed ? "opacity-50" : ""}`}>
+      <div className="flex items-center gap-3 px-4 py-3">
+        {/* iOS checkbox */}
         <button
           onClick={handleToggle}
           disabled={loading}
-          className={`w-6 h-6 rounded-full border-2 flex-shrink-0 transition-all ${
-            todo.completed
-              ? "bg-indigo-500 border-indigo-500"
-              : "border-gray-300 hover:border-indigo-400"
-          }`}
+          className="flex-shrink-0"
         >
-          {todo.completed && (
-            <span className="text-white text-xs flex items-center justify-center w-full h-full">
-              ✓
-            </span>
-          )}
+          <div
+            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+              todo.completed
+                ? "bg-[#34C759] border-[#34C759]"
+                : "border-[#C7C7CC]"
+            }`}
+          >
+            {todo.completed && (
+              <svg width="12" height="9" viewBox="0 0 12 9" fill="none">
+                <path d="M1 4L4.5 7.5L11 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </div>
         </button>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
+        {/* Content */}
+        <div className="flex-1 min-w-0" onClick={() => todo.description && setExpanded(v => !v)}>
+          <div className="flex items-center gap-2">
+            {/* Priority dot */}
             <span
-              className={`text-sm font-medium ${todo.completed ? "line-through text-gray-400" : "text-gray-800"}`}
-            >
-              {PRIORITY_BADGE[todo.priority]} {todo.title}
-            </span>
-            <span
-              className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLOR[todo.category]}`}
-            >
-              {todo.category}
+              className="w-2 h-2 rounded-full flex-shrink-0"
+              style={{ background: PRIORITY_COLOR[todo.priority] }}
+            />
+            <span className={`text-[15px] font-medium leading-snug flex-1 ${todo.completed ? "line-through text-[#8E8E93]" : "text-black"}`}>
+              {todo.title}
             </span>
           </div>
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className="text-xs text-gray-400">{todo.assignee}</span>
+
+          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+            <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md ${CATEGORY_BG[todo.category]}`}>
+              {todo.category}
+            </span>
+            <span className="text-[12px] text-[#8E8E93]">{todo.assignee}</span>
             {todo.requested_by && (
-              <span className="text-xs text-gray-400">
-                ← {todo.requested_by} 요청
-              </span>
+              <span className="text-[12px] text-[#8E8E93]">← {todo.requested_by}</span>
             )}
             {todo.estimated_minutes && (
-              <span className="text-xs text-gray-400">
-                ⏱ {todo.estimated_minutes}분
-              </span>
+              <span className="text-[12px] text-[#8E8E93]">{todo.estimated_minutes}분</span>
             )}
             {todo.due_time && (
-              <span className="text-xs text-gray-400">
-                🕐 {todo.due_time.slice(0, 5)}
-              </span>
+              <span className="text-[12px] text-[#8E8E93]">{todo.due_time.slice(0, 5)}</span>
             )}
             {showCountdown && (
               <Countdown dueTime={todo.due_time!} date={todo.date} />
             )}
           </div>
+
+          {expanded && todo.description && (
+            <p className="text-[13px] text-[#8E8E93] mt-1.5 leading-relaxed">{todo.description}</p>
+          )}
         </div>
 
         <div className="flex items-center gap-1 flex-shrink-0">
           {todo.description && (
-            <button
-              onClick={() => setExpanded((v) => !v)}
-              className="p-1 text-gray-400 hover:text-gray-600"
-            >
-              {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
+            <ChevronRight
+              size={16}
+              className={`text-[#C7C7CC] transition-transform ${expanded ? "rotate-90" : ""}`}
+            />
           )}
-          <button
-            onClick={handleDelete}
-            className="p-1 text-gray-300 hover:text-red-400"
-          >
-            <Trash2 size={16} />
+          <button onClick={handleDelete} className="p-1 ml-1">
+            <Trash2 size={15} className="text-[#C7C7CC]" />
           </button>
         </div>
       </div>
-
-      {expanded && todo.description && (
-        <div className="px-4 pb-4 text-sm text-gray-500 border-t border-gray-50 pt-3">
-          {todo.description}
-        </div>
-      )}
     </div>
   );
 }

@@ -5,19 +5,17 @@ import { Todo } from "@/types";
 
 type Props = {
   year: number;
-  month: number; // 0-indexed
+  month: number;
   todos: Todo[];
   selectedDate: string;
   onSelectDate: (date: string) => void;
 };
 
-export default function MonthCalendar({
-  year,
-  month,
-  todos,
-  selectedDate,
-  onSelectDate,
-}: Props) {
+const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
+export default function MonthCalendar({ year, month, todos, selectedDate, onSelectDate }: Props) {
+  const today = new Date().toISOString().split("T")[0];
+
   const countByDate = useMemo(() => {
     const map: Record<string, { total: number; done: number }> = {};
     for (const t of todos) {
@@ -28,74 +26,66 @@ export default function MonthCalendar({
     return map;
   }, [todos]);
 
-  const days = useMemo(() => {
-    const first = new Date(year, month, 1).getDay();
-    const total = new Date(year, month + 1, 0).getDate();
-    return { first, total };
-  }, [year, month]);
+  const { first, total } = useMemo(() => ({
+    first: new Date(year, month, 1).getDay(),
+    total: new Date(year, month + 1, 0).getDate(),
+  }), [year, month]);
 
-  const cells = [];
-  for (let i = 0; i < days.first; i++) cells.push(null);
-  for (let d = 1; d <= days.total; d++) cells.push(d);
-
-  const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
+  const cells: (number | null)[] = [
+    ...Array(first).fill(null),
+    ...Array.from({ length: total }, (_, i) => i + 1),
+  ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-4">
-      <div className="grid grid-cols-7 mb-2">
+    <div className="px-4">
+      <div className="grid grid-cols-7 mb-1">
         {DAYS.map((d, i) => (
           <div
             key={d}
-            className={`text-center text-xs font-medium py-1 ${i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-gray-400"}`}
+            className={`text-center text-xs font-medium py-1 ${
+              i === 0 ? "text-[#FF3B30]" : i === 6 ? "text-[#007AFF]" : "text-[#3C3C4399]"
+            }`}
           >
             {d}
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7">
         {cells.map((d, i) => {
-          if (!d) return <div key={`empty-${i}`} />;
+          if (!d) return <div key={`e-${i}`} />;
           const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
           const info = countByDate[dateStr];
           const isSelected = dateStr === selectedDate;
-          const isToday = dateStr === new Date().toISOString().split("T")[0];
-          const dow = (days.first + d - 1) % 7;
+          const isToday = dateStr === today;
+          const dow = (first + d - 1) % 7;
+          const allDone = info && info.done === info.total;
+          const hasPending = info && info.total - info.done > 0;
 
           return (
             <button
               key={d}
               onClick={() => onSelectDate(dateStr)}
-              className={`flex flex-col items-center justify-start py-1.5 rounded-xl transition-all ${
-                isSelected
-                  ? "bg-indigo-500 text-white"
-                  : isToday
-                    ? "bg-indigo-50"
-                    : "hover:bg-gray-50"
-              }`}
+              className="flex flex-col items-center py-1 gap-0.5"
             >
               <span
-                className={`text-sm font-medium leading-none ${
+                className={`w-8 h-8 flex items-center justify-center rounded-full text-[15px] font-medium transition-colors ${
                   isSelected
-                    ? "text-white"
+                    ? "bg-[#007AFF] text-white font-semibold"
+                    : isToday
+                    ? "text-[#007AFF] font-semibold"
                     : dow === 0
-                      ? "text-red-400"
-                      : dow === 6
-                        ? "text-blue-400"
-                        : "text-gray-700"
+                    ? "text-[#FF3B30]"
+                    : dow === 6
+                    ? "text-[#007AFF]"
+                    : "text-black"
                 }`}
               >
                 {d}
               </span>
-              {info && (
-                <div className="flex gap-0.5 mt-1">
-                  {info.done > 0 && (
-                    <span className="w-1 h-1 rounded-full bg-green-400" />
-                  )}
-                  {info.total - info.done > 0 && (
-                    <span className="w-1 h-1 rounded-full bg-indigo-300" />
-                  )}
-                </div>
-              )}
+              <div className="h-1.5 flex items-center gap-0.5">
+                {allDone && <span className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />}
+                {hasPending && <span className="w-1.5 h-1.5 rounded-full bg-[#007AFF]" />}
+              </div>
             </button>
           );
         })}
