@@ -1,25 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  const db = sql();
   try {
     const body = await req.json();
 
     if ("completed" in body) {
-      const result = await sql`
+      const result = await db`
         UPDATE todos
-        SET completed = ${body.completed}, completed_at = ${body.completed ? "NOW()" : null}
+        SET completed = ${body.completed}, completed_at = ${body.completed ? new Date().toISOString() : null}
         WHERE id = ${id}
         RETURNING *
       `;
-      return NextResponse.json(result.rows[0]);
+      return NextResponse.json(result[0]);
     }
 
-    const result = await sql`
+    const result = await db`
       UPDATE todos
       SET
         title = COALESCE(${body.title ?? null}, title),
@@ -33,7 +36,7 @@ export async function PATCH(
       WHERE id = ${id}
       RETURNING *
     `;
-    return NextResponse.json(result.rows[0]);
+    return NextResponse.json(result[0]);
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "DB error" }, { status: 500 });
@@ -45,8 +48,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  const db = sql();
   try {
-    await sql`DELETE FROM todos WHERE id = ${id}`;
+    await db`DELETE FROM todos WHERE id = ${id}`;
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error(e);
