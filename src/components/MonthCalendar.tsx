@@ -37,19 +37,26 @@ export default function MonthCalendar({ year, month, todos, selectedDate, onSele
   ];
 
   return (
-    <div className="px-4">
+    <div className="px-3">
+      {/* Day headers */}
       <div className="grid grid-cols-7 mb-1">
         {DAYS.map((d, i) => (
           <div
             key={d}
-            className={`text-center text-xs font-medium py-1 ${
-              i === 0 ? "text-[#FF3B30]" : i === 6 ? "text-[#007AFF]" : "text-[#3C3C4399]"
-            }`}
+            className="text-center py-1"
+            style={{
+              fontSize: 12,
+              fontWeight: 400,
+              letterSpacing: "-0.12px",
+              color: i === 0 ? "var(--color-red)" : i === 6 ? "var(--color-primary)" : "var(--color-ink-muted-48)",
+            }}
           >
             {d}
           </div>
         ))}
       </div>
+
+      {/* Date cells */}
       <div className="grid grid-cols-7">
         {cells.map((d, i) => {
           if (!d) return <div key={`e-${i}`} />;
@@ -61,6 +68,16 @@ export default function MonthCalendar({ year, month, todos, selectedDate, onSele
           const allDone = info && info.done === info.total;
           const hasPending = info && info.total - info.done > 0;
 
+          const textColor = isSelected
+            ? "#fff"
+            : isToday
+            ? "var(--color-primary)"
+            : dow === 0
+            ? "var(--color-red)"
+            : dow === 6
+            ? "var(--color-primary)"
+            : "var(--color-ink)";
+
           return (
             <button
               key={d}
@@ -68,23 +85,24 @@ export default function MonthCalendar({ year, month, todos, selectedDate, onSele
               className="flex flex-col items-center py-1 gap-0.5"
             >
               <span
-                className={`w-8 h-8 flex items-center justify-center rounded-full text-[15px] font-medium transition-colors ${
-                  isSelected
-                    ? "bg-[#007AFF] text-white font-semibold"
-                    : isToday
-                    ? "text-[#007AFF] font-semibold"
-                    : dow === 0
-                    ? "text-[#FF3B30]"
-                    : dow === 6
-                    ? "text-[#007AFF]"
-                    : "text-black"
-                }`}
+                className="w-8 h-8 flex items-center justify-center rounded-full transition-all"
+                style={{
+                  fontSize: 15,
+                  fontWeight: isSelected || isToday ? 600 : 400,
+                  letterSpacing: "-0.374px",
+                  background: isSelected ? "var(--color-primary)" : "transparent",
+                  color: textColor,
+                }}
               >
                 {d}
               </span>
               <div className="h-1.5 flex items-center gap-0.5">
-                {allDone && <span className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />}
-                {hasPending && <span className="w-1.5 h-1.5 rounded-full bg-[#007AFF]" />}
+                {allDone && (
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--color-green)" }} />
+                )}
+                {hasPending && (
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--color-primary)" }} />
+                )}
               </div>
             </button>
           );

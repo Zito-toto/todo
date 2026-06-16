@@ -1,61 +1,67 @@
 @import "tailwindcss";
 
 :root {
-  --ios-blue: #007AFF;
-  --ios-bg: #F2F2F7;
-  --ios-card: #FFFFFF;
-  --ios-label: #000000;
-  --ios-secondary: #3C3C43;
-  --ios-tertiary: #3C3C4399;
-  --ios-separator: #3C3C4349;
-  --ios-fill: #78788014;
-  --ios-red: #FF3B30;
-  --ios-green: #34C759;
-  --ios-orange: #FF9500;
-  --ios-purple: #AF52DE;
+  /* Brand & Accent */
+  --color-primary: #0066cc;
+  --color-primary-focus: #0071e3;
+  --color-primary-on-dark: #2997ff;
+
+  /* Surfaces */
+  --color-canvas: #ffffff;
+  --color-canvas-parchment: #f5f5f7;
+  --color-surface-pearl: #fafafc;
+  --color-surface-tile-1: #272729;
+  --color-surface-black: #000000;
+  --color-surface-chip: rgba(210, 210, 215, 0.64);
+
+  /* Text */
+  --color-ink: #1d1d1f;
+  --color-ink-muted-80: #333333;
+  --color-ink-muted-48: #7a7a7a;
+  --color-on-dark: #ffffff;
+  --color-body-muted: #cccccc;
+
+  /* Borders */
+  --color-hairline: #e0e0e0;
+  --color-divider-soft: rgba(0, 0, 0, 0.04);
+
+  /* Status */
+  --color-green: #34C759;
+  --color-red: #FF3B30;
+  --color-orange: #FF9500;
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 17px;
 }
 
 body {
-  background: var(--ios-bg);
-  color: var(--ios-label);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+  background: var(--color-canvas-parchment);
+  color: var(--color-ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.374px;
+  line-height: 1.47;
 }
 
-/* iOS bottom sheet animation */
+/* Bottom sheet animation */
 @keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
 }
-
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
-.sheet-enter {
-  animation: slideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-}
+.sheet-enter  { animation: slideUp 0.38s cubic-bezier(0.32, 0.72, 0, 1) both; }
+.overlay-enter { animation: fadeIn 0.25s ease both; }
 
-.overlay-enter {
-  animation: fadeIn 0.2s ease;
-}
-
-/* iOS list style */
-.ios-list-item {
-  background: var(--ios-card);
-  border-bottom: 0.5px solid var(--ios-separator);
-}
-.ios-list-item:last-child {
-  border-bottom: none;
-}
-
-/* Smooth active state */
-button:active {
-  opacity: 0.6;
-  transition: opacity 0.1s;
-}
+/* Active press micro-interaction */
+button:active { transform: scale(0.97); transition: transform 0.1s ease; }
